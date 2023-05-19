@@ -1,3 +1,4 @@
+import Jetson.GPIO as GPIO
 import numpy as np
 import tensorflow as tf
 import cv2
@@ -16,16 +17,16 @@ import time
 from pose_estimation.ml import Movenet
 movenet = Movenet('movenet_thunder')
 
-import Jetson.GPIO as GPIO
 
 no_pose_pin = 7
 good_pose_pin = 11
 bad_pose_pin = 13
 
-GPIO.setmode(GPIO.BOARD) 
-GPIO.setup(no_pose_pin, GPIO.OUT, initial=GPIO.LOW) 
-GPIO.setup(good_pose_pin, GPIO.OUT, initial=GPIO.LOW) 
-GPIO.setup(bad_pose_pin, GPIO.OUT, initial=GPIO.LOW) 
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(no_pose_pin, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(good_pose_pin, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(bad_pose_pin, GPIO.OUT, initial=GPIO.LOW)
+
 
 def detect(input_tensor, inference_count=3):
     image_height, image_width, channel = input_tensor.shape
@@ -243,6 +244,8 @@ while cap.isOpened():
         shouldContinue = min_landmark_score >= 0.2
         if not shouldContinue:
             GPIO.output(no_pose_pin, GPIO.HIGH)
+            response = requests.post(
+                'https://pbl5server.onrender.com/api/img/pose/unsave', files=files, data=payload)
             time.sleep(1)
             GPIO.output(no_pose_pin, GPIO.LOW)
             continue
@@ -279,7 +282,7 @@ while cap.isOpened():
 
         if class_names[y_pred] == "Thang lung":
             GPIO.output(good_pose_pin, GPIO.HIGH)
-        else: 
+        else:
             GPIO.output(bad_pose_pin, GPIO.HIGH)
 
         response = requests.post(

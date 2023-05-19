@@ -227,11 +227,11 @@ while cap.isOpened():
         tensor = tf.convert_to_tensor(image)
         person = detect(tensor)
 
-        min_landmark_score = min(
-            [keypoint.score for keypoint in person.keypoints])
-        shouldContinue = min_landmark_score >= 0.2
-        if not shouldContinue:
-            continue
+        # min_landmark_score = min(
+        #     [keypoint.score for keypoint in person.keypoints])
+        # shouldContinue = min_landmark_score >= 0.2
+        # if not shouldContinue:
+        #     continue
 
         landmarks = []
         for keypoint in person.keypoints:
