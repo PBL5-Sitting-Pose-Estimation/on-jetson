@@ -244,6 +244,10 @@ while cap.isOpened():
         shouldContinue = min_landmark_score >= 0.2
         if not shouldContinue:
             GPIO.output(no_pose_pin, GPIO.HIGH)
+            cv2.imwrite('./temp.jpg', image)
+            files = {
+                "image": open('./temp.jpg', "rb")
+            }
             response = requests.post(
                 'https://pbl5server.onrender.com/api/img/pose/unsave', files=files, data=payload)
             time.sleep(1)
