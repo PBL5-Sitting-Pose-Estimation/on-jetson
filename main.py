@@ -242,6 +242,9 @@ while cap.isOpened():
             [keypoint.score for keypoint in person.keypoints])
         shouldContinue = min_landmark_score >= 0.2
         if not shouldContinue:
+            GPIO.output(no_pose_pin, GPIO.HIGH)
+            time.sleep(1)
+            GPIO.output(no_pose_pin, GPIO.LOW)
             continue
 
         landmarks = []
@@ -274,12 +277,18 @@ while cap.isOpened():
             "date": tstr
         }
 
+        if class_names[y_pred] == "Thang lung":
+            GPIO.output(good_pose_pin, GPIO.HIGH)
+        else: 
+            GPIO.output(bad_pose_pin, GPIO.HIGH)
+
         response = requests.post(
             'https://pbl5server.onrender.com/api/img/pose', files=files, data=payload)
         # response = requests.post('http://localhost:8080/api/img/pose', files=files, data=payload)
         time.sleep(0.5)
+        GPIO.output(no_pose_pin, GPIO.LOW)
+        GPIO.output(no_pose_pin, GPIO.LOW)
 
-        # Gõ q để tắt cam
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
     else:
