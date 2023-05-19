@@ -22,6 +22,10 @@ no_pose_pin = 7
 good_pose_pin = 11
 bad_pose_pin = 13
 
+GPIO.setmode(GPIO.BOARD) 
+GPIO.setup(no_pose_pin, GPIO.OUT, initial=GPIO.HIGH) 
+GPIO.setup(good_pose_pin, GPIO.OUT, initial=GPIO.HIGH) 
+GPIO.setup(bad_pose_pin, GPIO.OUT, initial=GPIO.HIGH) 
 
 def detect(input_tensor, inference_count=3):
     image_height, image_width, channel = input_tensor.shape
