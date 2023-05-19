@@ -202,10 +202,6 @@ def evaluate_model(interpreter, X):
 
     predicted_label = np.argmax(output()[0])
 
-    notes = ""
-    for i in range(len(output()[0])):
-        notes += f"{class_names[i]}: {round(output()[0][i]*100/output()[0].sum(), 5)} %\n"
-
     return predicted_label
 
 
@@ -216,8 +212,6 @@ with open('pose_labels.txt', 'r') as f:
         class_names.append(line.strip())
 
 print(class_names)
-
-y_pred = []
 
 # Evaluate the accuracy of the converted TFLite model
 classifier_interpreter = tf.lite.Interpreter(

@@ -23,9 +23,9 @@ good_pose_pin = 11
 bad_pose_pin = 13
 
 GPIO.setmode(GPIO.BOARD) 
-GPIO.setup(no_pose_pin, GPIO.OUT, initial=GPIO.HIGH) 
-GPIO.setup(good_pose_pin, GPIO.OUT, initial=GPIO.HIGH) 
-GPIO.setup(bad_pose_pin, GPIO.OUT, initial=GPIO.HIGH) 
+GPIO.setup(no_pose_pin, GPIO.OUT, initial=GPIO.LOW) 
+GPIO.setup(good_pose_pin, GPIO.OUT, initial=GPIO.LOW) 
+GPIO.setup(bad_pose_pin, GPIO.OUT, initial=GPIO.LOW) 
 
 def detect(input_tensor, inference_count=3):
     image_height, image_width, channel = input_tensor.shape
@@ -213,10 +213,6 @@ def evaluate_model(interpreter, X):
 
     predicted_label = np.argmax(output()[0])
 
-    notes = ""
-    for i in range(len(output()[0])):
-        notes += f"{class_names[i]}: {round(output()[0][i]*100/output()[0].sum(), 5)} %\n"
-
     return predicted_label
 
 
@@ -227,8 +223,6 @@ with open('pose_labels.txt', 'r') as f:
         class_names.append(line.strip())
 
 print(class_names)
-
-y_pred = []
 
 # Evaluate the accuracy of the converted TFLite model
 classifier_interpreter = tf.lite.Interpreter(
@@ -248,9 +242,6 @@ while cap.isOpened():
             [keypoint.score for keypoint in person.keypoints])
         shouldContinue = min_landmark_score >= 0.2
         if not shouldContinue:
-            GPIO.output(no_pose_pin, GPIO.HIGH)
-            time.sleep(1)
-            GPIO.output(no_pose_pin, GPIO.LOW)
             continue
 
         landmarks = []
@@ -286,14 +277,7 @@ while cap.isOpened():
         response = requests.post(
             'https://pbl5server.onrender.com/api/img/pose', files=files, data=payload)
         # response = requests.post('http://localhost:8080/api/img/pose', files=files, data=payload)
-        if class_names[y_pred] == "Thang lung":
-            GPIO.output(good_pose_pin, GPIO.HIGH)
-            time.sleep(0.5)
-            GPIO.output(good_pose_pin, GPIO.LOW)
-        else:
-            GPIO.output(bad_pose_pin, GPIO.HIGH)
-            time.sleep(0.5)
-            GPIO.output(bad_pose_pin, GPIO.LOW)
+        time.sleep(0.5)
 
         # Gõ q để tắt cam
         if cv2.waitKey(10) & 0xFF == ord('q'):
