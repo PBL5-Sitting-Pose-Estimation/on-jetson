@@ -97,6 +97,15 @@ def feature_pose(landmarks):
 
     # Scale the landmarks to a constant pose size
     pose_size = get_pose_size(landmarks)
+
+    xVal = tf.gather(landmarks, BodyPart.RIGHT_KNEE.value, axis=1).numpy()[0]
+    tempList = landmarks.numpy().tolist()
+
+    if xVal[0] < 0:
+        for coordinate in tempList[0]:
+            coordinate[0] = -coordinate[0]
+        landmarks = tf.constant(tempList, dtype=np.float32)
+
     landmarks /= pose_size
 
     return landmarks
@@ -249,7 +258,7 @@ while cap.isOpened():
                 "image": open('./temp.jpg', "rb")
             }
             response = requests.post(
-                'https://pbl5server.onrender.com/api/img/pose/unsave', files=files, data=payload)
+                'https://pbl5server.onrender.com/api/img/pose/unsave', files=files)
             time.sleep(1)
             GPIO.output(no_pose_pin, GPIO.LOW)
             continue
@@ -293,8 +302,8 @@ while cap.isOpened():
             'https://pbl5server.onrender.com/api/img/pose', files=files, data=payload)
         # response = requests.post('http://localhost:8080/api/img/pose', files=files, data=payload)
         time.sleep(0.5)
-        GPIO.output(no_pose_pin, GPIO.LOW)
-        GPIO.output(no_pose_pin, GPIO.LOW)
+        GPIO.output(good_pose_pin, GPIO.LOW)
+        GPIO.output(bad_pose_pin, GPIO.LOW)
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
