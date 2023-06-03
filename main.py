@@ -259,7 +259,6 @@ while cap.isOpened():
             }
             response = requests.post(
                 'https://pbl5server.onrender.com/api/img/pose/unsave', files=files)
-            time.sleep(1)
             GPIO.output(no_pose_pin, GPIO.LOW)
             continue
 
@@ -301,7 +300,6 @@ while cap.isOpened():
         response = requests.post(
             'https://pbl5server.onrender.com/api/img/pose', files=files, data=payload)
         # response = requests.post('http://localhost:8080/api/img/pose', files=files, data=payload)
-        time.sleep(0.5)
         GPIO.output(good_pose_pin, GPIO.LOW)
         GPIO.output(bad_pose_pin, GPIO.LOW)
 
